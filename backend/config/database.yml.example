@@ -1,0 +1,18 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: BOGGLE_development
+
+test:
+  <<: *default
+  database: BOGGLE_test
+
+production:
+  <<: *default
+  database: BOGGLE_production
+  username: username
+  password: <%= ENV['BOGGLE_DATABASE_PASSWORD'] %>
