@@ -10,7 +10,7 @@ puts "Adding words from dictionary: #{ENV['DICTIONARY_PATH']} ..."
 
 words = []
 
-File.open(Rails.root.join(ENV['DICTIONARY_PATH'])).each_with_index do |word, i|
+File.open(Rails.root.join(ENV['DICTIONARY_PATH'])).each do |word|
   words << Word.new(value: word.strip)
 end
 

@@ -4,7 +4,7 @@ class GamesController < ApplicationController
   def show
     game = Game.find(params[:id])
 
-    render json: game, serializer: FullGameInfoSerializer, status: 200
+    render json: game, serializer: FullGameInfoSerializer
   end
 
   def create
@@ -19,7 +19,7 @@ class GamesController < ApplicationController
 
     Boggle::Game.new.load(game).check_word(params[:word])
 
-    render json: game, serializer: FullGameInfoSerializer, status: 200
+    render json: game, serializer: FullGameInfoSerializer
   end
 
   private

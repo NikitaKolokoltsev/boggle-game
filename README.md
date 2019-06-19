@@ -4,8 +4,16 @@ API for playing [Boggle](https://en.wikipedia.org/wiki/Boggle).
 Ruby 2.5.0 \
 Rails 5.2.2
 
-**Hosted on** [Heroku](https://young-depths-87855.herokuapp.com)
+**Hosted on** [Heroku](https://young-depths-87855.herokuapp.com) \
+*Responds only to requests to endpoints described in the **Endpoints** section.*
 
+## Local Setup
+1. `bundle install`
+2. `rake db:setup`
+3. `rails s`
+4. Open [http://localhost:3000](http://localhost:3000)
+
+## Endpoints
 ### Create the game
 ```
 POST /games
