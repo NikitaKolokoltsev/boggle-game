@@ -5,3 +5,15 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+
+puts "Adding words from dictionary: #{ENV['DICTIONARY_PATH']} ..."
+
+words = []
+
+File.open(Rails.root.join(ENV['DICTIONARY_PATH'])).each_with_index do |word, i|
+  words << Word.new(word: word.strip)
+end
+
+Word.import(words)
+
+puts "Words added."
