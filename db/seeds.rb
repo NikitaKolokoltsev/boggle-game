@@ -11,7 +11,7 @@ puts "Adding words from dictionary: #{ENV['DICTIONARY_PATH']} ..."
 words = []
 
 File.open(Rails.root.join(ENV['DICTIONARY_PATH'])).each_with_index do |word, i|
-  words << Word.new(word: word.strip)
+  words << Word.new(value: word.strip)
 end
 
 Word.import(words)

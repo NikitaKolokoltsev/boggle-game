@@ -1,41 +1,35 @@
-class GamesController < ActionController::API
+class GamesController < ApplicationController
+  before_action :validate_update_params, only: [:update]
+
   def show
     game = Game.find(params[:id])
 
     render json: game, serializer: FullGameInfoSerializer, status: 200
-  rescue ActiveRecord::RecordNotFound => e
-    render json: { message: e.message }, status: 404
   end
 
   def create
-    params_missing = game_params[:duration].blank? || [true, false].exclude?(game_params[:random])
-    return render json: { message: "Please provide 'duration' and 'random' options for the game" }, status: 400 if params_missing
+    new_game_params = game_params.to_h.symbolize_keys
+    game = Boggle::Game.new(new_game_params).start.game
 
-    game = Boggle::Game.new(game_params).start.game
-
-    return render json: game, serializer: ShortGameInfoSerializer, status: 201
+    render json: game, serializer: ShortGameInfoSerializer, status: 201
   end
 
   def update
-    return render json: { message: 'Please provide authentication token for the game.' }, status: 400 if params[:token].blank?
-
-    game = Game.find(params[:id])
-
-    return render json: { message: 'Invalid authentication token.' }, status: 400 if game.token != params[:token]
+    game = Game.find_by!(id: params[:id], token: params[:token])
 
     Boggle::Game.new.load(game).check_word(params[:word])
 
-    return render json: game, serializer: FullGameInfoSerializer, status: 200
-
-  rescue ActiveRecord::RecordNotFound => e
-    render json: { message: e.message }, status: 404
-  rescue StandardError => e
-    render json: { message: e.message }, status: 400
+    render json: game, serializer: FullGameInfoSerializer, status: 200
   end
 
   private
 
   def game_params
-    params.permit(:board, :random, :duration).to_h.symbolize_keys
+    params.require(%i[duration random])
+    params.permit(:board, :random, :duration)
+  end
+
+  def validate_update_params
+    params.require(%i[token word])
   end
 end

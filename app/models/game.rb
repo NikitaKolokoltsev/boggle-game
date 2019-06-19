@@ -4,7 +4,7 @@ class Game < ApplicationRecord
 
   validates_presence_of :board, :duration
 
-  before_create :setup_authentication_token
+  after_create :setup_authentication_token
 
   def time_left
     time_left = created_at + duration - Time.now
@@ -21,5 +21,6 @@ class Game < ApplicationRecord
 
   def setup_authentication_token
     self.token = JWT.encode({ game_id: id }, Rails.application.secrets.secret_key_base)
+    self.save
   end
 end

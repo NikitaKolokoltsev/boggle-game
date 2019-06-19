@@ -1,31 +1,38 @@
 module Boggle
   class Game
-    class MissingWordFromDictionary < StandardError
+    class Error < StandardError; end
+
+    class MissingWordFromDictionary < Error
       def message
-        'Dictionary dose not contain this word.'
+        'Dictionary does not contain this word.'
       end
     end
 
-    class MissingWordFromBoard < StandardError
+    class MissingWordFromBoard < Error
       def message
         'This word cannot be derived from the current board.'
       end
     end
 
-    class WordAlreadyUsed < StandardError
+    class WordAlreadyUsed < Error
       def message
         'This word was already used in this game.'
       end
     end
 
-    class GameFinished < StandardError
+    class WordFormatMismatch < Error
+      def message
+        'Word must consist only of letters A-Z'
+      end
+    end
+
+    class GameFinished < Error
       def message
         'This game is already finished.'
       end
     end
 
-    DEFAULT_DURATION = 300.freeze # seconds
-    ADJACENT_CELLS_INDEXES = [
+    ADJACENT_CELLS_SHIFTS = [
       [-1, -1], # DIAGONAL TOP LEFT
       [-1, 0],  # TOP
       [-1, 1],  # DIAGONAL TOP RIGHT
@@ -38,7 +45,7 @@ module Boggle
 
     attr_reader :board, :game, :duration
 
-    def initialize(board: Board.default.flatten, random: false, duration: DEFAULT_DURATION)
+    def initialize(board: Board.default.flatten, random: false, duration: nil)
       @board = random ? Board.random : Board.create(board)
       @duration = duration
       @game = ::Game.new(board: @board.flatten, duration: @duration)
@@ -53,15 +60,15 @@ module Boggle
       @game = game
       @duration = game.duration
       @board = Board.to_matrix(game.board)
-
       self
     end
 
     def check_word(word)
       raise GameFinished if game.finished?
-      raise MissingWordFromBoard unless word_is_on_board?(word.upcase)
+      raise WordFormatMismatch unless word.match(::Word::WORD_REGEX).present?
+      raise MissingWordFromBoard unless is_word_on_board?(word.upcase)
 
-      word = Word.find_by(word: word.downcase)
+      word = Word.find_by(value: word.downcase)
       raise MissingWordFromDictionary unless word.present?
 
       word_used = @game.words.find_by(id: word.id).present?
@@ -74,7 +81,7 @@ module Boggle
       @game
     end
 
-    def word_is_on_board?(word)
+    def is_word_on_board?(word)
       letters = word.split('')
       word_found = false
 
@@ -121,7 +128,7 @@ module Boggle
     def adjacent_cells(row, col)
       adjacent_cells = []
 
-      ADJACENT_CELLS_INDEXES.each do |cell|
+      ADJACENT_CELLS_SHIFTS.each do |cell|
         adjacent_cell_row = row + cell[0]
         adjacent_cell_col = col + cell[1]
 

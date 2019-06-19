@@ -1,7 +1,7 @@
 module Boggle
   class Board
     BOARD_SIZE = 4
-    LETTERS = %w[A B C D E F G H I J K L M N O P Q R S T U V W X Y Z *]
+    LETTERS = %w[A B C D E F G H I J K L M N O P Q R S T U V W X Y Z *].freeze
 
     def self.create(board)
       board.is_a?(Array) ? to_matrix(board) : to_matrix(board.split(', '))

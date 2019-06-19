@@ -24,16 +24,17 @@ ActiveRecord::Schema.define(version: 2019_06_17_065502) do
 
   create_table "games", force: :cascade do |t|
     t.string "board", array: true
-    t.integer "duration"
+    t.integer "duration", default: 0, null: false
     t.string "token"
-    t.integer "points", default: 0
+    t.integer "points", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["token"], name: "index_games_on_token", unique: true
   end
 
   create_table "words", force: :cascade do |t|
-    t.string "word"
-    t.index ["word"], name: "index_words_on_word"
+    t.string "value", null: false
+    t.index ["value"], name: "index_words_on_value", unique: true
   end
 
 end
